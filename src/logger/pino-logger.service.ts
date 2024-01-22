@@ -5,6 +5,10 @@ import { ASYNC_STORAGE } from './logger.constants';
 import { AsyncLocalStorage } from 'async_hooks';
 const logger = pino(pretty());
 
+interface Stringable {
+  toString(): string;
+}
+
 @Injectable()
 export class PinoLoggerService implements LoggerService {
   constructor(
@@ -12,11 +16,11 @@ export class PinoLoggerService implements LoggerService {
     private readonly asyncStorage: AsyncLocalStorage<Map<string, string>>,
   ) {}
 
-  private getMessage(message: any, context?: string) {
-    return context ? `[ ${context}] ${message}` : message;
+  private getMessage(message: Stringable, context?: string) {
+    return context ? `[ ${context}] ${message}` : message.toString();
   }
 
-  error(message: any, context?: string, trace?: string) {
+  error(message: Stringable, context?: string, trace?: string) {
     const traceId = this.asyncStorage.getStore()?.get('traceId');
     logger.error({ traceId }, this.getMessage(message, context));
     if (trace) {
@@ -24,12 +28,12 @@ export class PinoLoggerService implements LoggerService {
     }
   }
 
-  log(message: any, context?: string) {
+  log(message: Stringable, context?: string) {
     const traceId = this.asyncStorage.getStore()?.get('traceId');
     logger.info({ traceId }, this.getMessage(message, context));
   }
 
-  warn(message: any, context?: string) {
+  warn(message: Stringable, context?: string) {
     const traceId = this.asyncStorage.getStore()?.get('traceId');
     logger.warn({ traceId }, this.getMessage(message, context));
   }
