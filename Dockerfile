@@ -1,6 +1,6 @@
-FROM node:18-alpine
+FROM node:20
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY . .
 
@@ -8,4 +8,6 @@ RUN npm ci
 
 RUN npm run build
 
-CMD ["node", "dist/main"]
+RUN npm prune --production
+
+CMD ["npm", "run", "start:prod"]
